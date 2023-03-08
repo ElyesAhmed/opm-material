@@ -215,10 +215,10 @@ public:
 
         // copy the SATNUM grid property. in some cases this is not necessary, but it
         // should not require much memory anyway...
-        satnumRegionArray_.resize(numCompressedElems);
+        satnumRegionArray_.resize(numCompressedElems,0);
         if (eclState.fieldProps().has_int("SATNUM")) {
             const auto& satnumRawData = eclState.fieldProps().get_int("SATNUM");
-            for (unsigned elemIdx = 0; elemIdx < numCompressedElems; ++elemIdx) {
+            for (unsigned elemIdx = 0; elemIdx < satnumRawData.size(); ++elemIdx) {
                 satnumRegionArray_[elemIdx] = satnumRawData[elemIdx] - 1;
             }
         }
@@ -493,6 +493,10 @@ public:
         return materialLawParams_[elemIdx];
     }
 
+    void setMaterialLawParams( std::vector<MaterialLawParams> materialLawParams)
+    {
+        materialLawParams_ = materialLawParams;
+    }
     /*!
      * \brief Returns a material parameter object for a given element and saturation region.
      *
@@ -617,7 +621,7 @@ public:
     int imbnumRegionIdx(unsigned elemIdx) const
     { return imbnumRegionArray_[elemIdx]; }
 
-    std::shared_ptr<MaterialLawParams>& materialLawParamsPointerReferenceHack(unsigned elemIdx)
+    MaterialLawParams& materialLawParamsPointerReferenceHack(unsigned elemIdx)
     {
         assert(0 <= elemIdx && elemIdx <  materialLawParams_.size());
         return materialLawParams_[elemIdx];
@@ -1258,7 +1262,6 @@ private:
     enum EclTwoPhaseApproach twoPhaseApproach_ = EclTwoPhaseApproach::EclTwoPhaseGasOil;
 
     std::vector<MaterialLawParams> materialLawParams_;
-
     std::vector<int> satnumRegionArray_;
     std::vector<int> krnumXArray_;
     std::vector<int> krnumYArray_;
